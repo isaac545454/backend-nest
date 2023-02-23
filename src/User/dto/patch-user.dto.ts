@@ -1,14 +1,4 @@
-import { IsString, IsEmail, IsStrongPassword } from "class-validator";
+import { CreateUserDTO } from "./create-user.dto";
+import { PartialType } from "@nestjs/mapped-types";
 
-export class PathUserDTO {
-  @IsString()
-  name: string;
-
-  @IsEmail()
-  email: string;
-
-  @IsStrongPassword({
-    minLength: 6,
-  })
-  password: string;
-}
+export class PathUserDTO extends PartialType(CreateUserDTO) {}
