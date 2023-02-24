@@ -37,13 +37,37 @@ export class UserService {
     });
   }
 
-  async updatePartial(id: number, data: PathUserDTO) {
+  async updatePartial(
+    id: number,
+    { birthAt, name, email, password }: PathUserDTO
+  ) {
     await this.exists(id);
+
+    const data: any = {};
+
+    if (birthAt) {
+      data.birthAt = new Date(birthAt);
+    }
+    if (name) {
+      data.birthAt = name;
+    }
+    if (email) {
+      data.birthAt = email;
+    }
+    if (password) {
+      data.birthAt = password;
+    }
+
     return this.prisma.user.update({
       where: {
         id: id,
       },
-      data: data,
+      data: {
+        email,
+        password,
+        name,
+        birthAt: birthAt ? new Date(birthAt) : null,
+      },
     });
   }
 
