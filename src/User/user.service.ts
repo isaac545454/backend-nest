@@ -22,6 +22,7 @@ export class UserService {
   }
 
   async update(id: number, data: UpdateUserDTO) {
+    await this.exists(id);
     return this.prisma.user.update({
       where: {
         id: id,
@@ -31,7 +32,13 @@ export class UserService {
   }
 
   async updatePartial(id: number, data: PathUserDTO) {
-    //
+    await this.exists(id);
+    return this.prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: data,
+    });
   }
 
   async findAll() {
