@@ -21,13 +21,19 @@ export class UserService {
     });
   }
 
-  async update(id: number, data: UpdateUserDTO) {
+  async update(id: number, { birthAt, name, email, password }: UpdateUserDTO) {
     await this.exists(id);
+
     return this.prisma.user.update({
       where: {
         id: id,
       },
-      data: data,
+      data: {
+        email,
+        password,
+        name,
+        birthAt: birthAt ? new Date(birthAt) : null,
+      },
     });
   }
 
