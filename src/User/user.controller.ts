@@ -10,6 +10,7 @@ import {
   Put,
   UseInterceptors,
 } from "@nestjs/common";
+import { paramsId } from "src/decorators/params-id-decorators";
 import { LogInterceptor } from "src/interceptors/log.interceptor";
 import { CreateUserDTO } from "./dto/create-user.dto";
 import { PathUserDTO } from "./dto/patch-user.dto";
@@ -31,28 +32,22 @@ export class UserController {
   }
 
   @Get(":id")
-  async findOne(@Param("id", ParseIntPipe) id: number) {
+  async findOne(@paramsId() id: number) {
     return this.userService.findOne(id);
   }
 
   @Put(":id")
-  async update(
-    @Param("id", ParseIntPipe) id: number,
-    @Body() data: UpdateUserDTO
-  ) {
+  async update(@paramsId() id: number, @Body() data: UpdateUserDTO) {
     return this.userService.update(id, data);
   }
 
   @Patch(":id")
-  async updatePartial(
-    @Param("id", ParseIntPipe) id: number,
-    @Body() Body: PathUserDTO
-  ) {
+  async updatePartial(@paramsId() id: number, @Body() Body: PathUserDTO) {
     return this.userService.updatePartial(id, Body);
   }
 
   @Delete(":id")
-  async delete(@Param("id", ParseIntPipe) id: number) {
+  async delete(@paramsId() id: number) {
     return this.userService.delete(id);
   }
 }
