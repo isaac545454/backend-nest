@@ -3,6 +3,7 @@ import { UserService } from "src/User/user.service";
 import { AuhtService } from "./auth.service";
 import { AuthForgetDTO } from "./dto/auth-forget-dto";
 import { AuthLoginDTO } from "./dto/auth-login-dto";
+import { AuthMeDTO } from "./dto/auth-me-dto";
 import { AuthRegisterDTO } from "./dto/auth-register-dto";
 import { AuthResetDTO } from "./dto/auth-reset-dto";
 
@@ -33,7 +34,7 @@ export class AuthController {
     return this.authService.reset(password, token);
   }
   @Post("me")
-  async me(@Body() Body) {
-    return this.authService.checkToken(Body.token);
+  async me(@Body() { token }: AuthMeDTO) {
+    return this.authService.checkToken(token);
   }
 }

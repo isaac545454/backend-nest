@@ -1,5 +1,9 @@
 import { User } from ".prisma/client";
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UserService } from "src/User/user.service";
@@ -7,33 +11,52 @@ import { AuthRegisterDTO } from "./dto/auth-register-dto";
 
 @Injectable()
 export class AuhtService {
+  private audience = "user";
+  private issuer = "login";
   constructor(
     private readonly jwtservice: JwtService,
     private readonly prisma: PrismaService,
     private readonly userService: UserService
   ) {}
+
   async createToken(user: User) {
     return {
       acessTokem: this.jwtservice.sign(
         {
+          id: user.id,
           name: user.name,
           email: user.email,
         },
         {
           expiresIn: "7 days",
           subject: String(user.id),
-          issuer: "login",
-          audience: "user",
+          issuer: this.issuer,
+          audience: this.audience,
         }
       ),
     };
   }
   async checkToken(token: string) {
-    return this.jwtservice.verify(token, {
-      audience: "user",
-      issuer: "login",
-    });
+    try {
+      const data = this.jwtservice.verify(token, {
+        issuer: this.issuer,
+        audience: this.audience,
+      });
+      return data;
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
   }
+
+  async isValidation(token: string) {
+    try {
+      this.checkToken(token);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   async login(email: string, password: string) {
     const user = await this.prisma.user.findFirst({
       where: {
