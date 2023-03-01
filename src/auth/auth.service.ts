@@ -29,7 +29,10 @@ export class AuhtService {
     };
   }
   async checkToken(token: string) {
-    return;
+    return this.jwtservice.verify(token, {
+      audience: "user",
+      issuer: "login",
+    });
   }
   async login(email: string, password: string) {
     const user = await this.prisma.user.findFirst({
