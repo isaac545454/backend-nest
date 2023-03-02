@@ -15,6 +15,7 @@ model User {
   birthAt   DateTime? @db.Date
   createdAt DateTime? @default(now()) @db.Timestamp(0)
   updateAt  DateTime? @default(now()) @db.Timestamp(0)
+  role      Int       @default(1)
 
   @@map("users")
 }
