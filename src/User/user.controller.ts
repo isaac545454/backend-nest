@@ -22,7 +22,7 @@ import { UserService } from "./user.service";
 
 @UseGuards(AuthGuard, RoleGuard)
 @UseInterceptors(LogInterceptor)
-@Roles(Role.admin)
+@Roles(Role.User)
 @Controller("users")
 export class UserController {
   constructor(private readonly userService: UserService) {}

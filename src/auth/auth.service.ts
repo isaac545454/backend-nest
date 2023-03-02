@@ -8,6 +8,7 @@ import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "src/prisma/prisma.service";
 import { UserService } from "src/User/user.service";
 import { AuthRegisterDTO } from "./dto/auth-register-dto";
+import * as brypt from "bcrypt";
 
 @Injectable()
 export class AuhtService {
@@ -61,12 +62,14 @@ export class AuhtService {
     const user = await this.prisma.user.findFirst({
       where: {
         email,
-        password,
       },
     });
 
     if (!user) throw new UnauthorizedException("Email ou senha incorretos.");
 
+    if (!(await brypt.compare(password, user.password))) {
+      throw new UnauthorizedException("Email ou senha incorretos.");
+    }
     return this.createToken(user);
   }
   async forget(email: string) {
