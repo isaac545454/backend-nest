@@ -5,9 +5,11 @@ import { AuthModule } from "./auth/auth.module";
 import { UserModule } from "./User/user.module";
 import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { APP_GUARD } from "@nestjs/core";
+import { ConfigModule } from "@nestjs/config";
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     ThrottlerModule.forRoot({
       ttl: 60,
       limit: 1000,
