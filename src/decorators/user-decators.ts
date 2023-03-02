@@ -5,11 +5,15 @@ import {
 } from "@nestjs/common";
 
 export const User = createParamDecorator(
-  (_: unknown, context: ExecutionContext) => {
+  (filter: string, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest();
 
     if (request.user) {
-      return request.user;
+      if (filter) {
+        return request.user[filter];
+      } else {
+        return request.user;
+      }
     } else {
       throw new NotFoundException("Usuario não encontrado no request");
     }
