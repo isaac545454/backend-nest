@@ -22,41 +22,36 @@ import { UserService } from "./user.service";
 
 @UseGuards(AuthGuard, RoleGuard)
 @UseInterceptors(LogInterceptor)
+@Roles(Role.admin)
 @Controller("users")
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Roles(Role.admin)
   @Post()
   async create(@Body() data: CreateUserDTO) {
     return this.userService.create(data);
   }
 
-  @Roles(Role.admin)
   @Get()
   async findAll() {
     return this.userService.findAll();
   }
 
-  @Roles(Role.admin)
   @Get(":id")
   async findOne(@paramsId() id: number) {
     return this.userService.findOne(id);
   }
 
-  @Roles(Role.admin)
   @Put(":id")
   async update(@paramsId() id: number, @Body() data: UpdateUserDTO) {
     return this.userService.update(id, data);
   }
 
-  @Roles(Role.admin)
   @Patch(":id")
   async updatePartial(@paramsId() id: number, @Body() Body: PathUserDTO) {
     return this.userService.updatePartial(id, Body);
   }
 
-  @Roles(Role.admin)
   @Delete(":id")
   async delete(@paramsId() id: number) {
     return this.userService.delete(id);
