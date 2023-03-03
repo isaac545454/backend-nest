@@ -1,6 +1,10 @@
 import {
+  BadRequestException,
   Body,
   Controller,
+  FileTypeValidator,
+  MaxFileSizeValidator,
+  ParseFilePipe,
   Post,
   UploadedFile,
   UseGuards,
@@ -12,10 +16,9 @@ import { UserService } from "src/User/user.service";
 import { AuhtService } from "./auth.service";
 import { AuthForgetDTO } from "./dto/auth-forget-dto";
 import { AuthLoginDTO } from "./dto/auth-login-dto";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { AuthRegisterDTO } from "./dto/auth-register-dto";
 import { AuthResetDTO } from "./dto/auth-reset-dto";
-import { writeFile } from "fs/promises";
 import { join } from "path";
 import { FileService } from "src/file/file.service";
 
@@ -55,17 +58,35 @@ export class AuthController {
   @UseInterceptors(FileInterceptor("file"))
   @UseGuards(AuthGuard)
   @Post("photo")
-  async upload(@User() user, @UploadedFile() photo: Express.Multer.File) {
+  async upload(
+    @User() user,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new FileTypeValidator({
+            fileType: "image/jpeg",
+          }),
+          new MaxFileSizeValidator({
+            maxSize: 1024 * 50,
+          }),
+        ],
+      })
+    )
+    photo: Express.Multer.File
+  ) {
     const path = join(
       __dirname,
       "../",
       "../",
       "storage",
       "photos",
-      `photos-${user.id}.png`
+      `photos-${user.id}.jpeg`
     );
-
-    this.fileService.upload(photo, path);
+    try {
+      this.fileService.upload(photo, path);
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
 
     return { sucess: true };
   }
