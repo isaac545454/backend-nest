@@ -9,6 +9,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { UserService } from "src/User/user.service";
 import { AuthRegisterDTO } from "./dto/auth-register-dto";
 import * as brypt from "bcrypt";
+import { MailerService } from "@nestjs-modules/mailer";
 
 @Injectable()
 export class AuhtService {
@@ -17,7 +18,8 @@ export class AuhtService {
   constructor(
     private readonly jwtservice: JwtService,
     private readonly prisma: PrismaService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly mailer: MailerService
   ) {}
 
   createToken(user: User) {
@@ -81,24 +83,57 @@ export class AuhtService {
 
     if (!user) throw new UnauthorizedException("Email incorretos.");
 
-    //TODO: ENVIAR EMAIL
+    const token = this.jwtservice.sign(
+      {
+        id: user.id,
+      },
+      {
+        expiresIn: "30 minutes",
+        subject: String(user.id),
+        issuer: "forget",
+        audience: this.audience,
+      }
+    );
+    await this.mailer.sendMail({
+      subject: "Recuperação de senha",
+      to: "isaac@dev.com.br",
+      template: "forget",
+      context: {
+        name: user.name,
+        token,
+      },
+    });
 
     return true;
   }
   async reset(password: string, token: string) {
+    try {
+      const { id: idToken } = this.jwtservice.verify(token, {
+        issuer: "forget",
+        audience: this.audience,
+      });
+      const id = idToken;
+
+      if (isNaN(Number(idToken))) {
+        throw new BadRequestException("Token invalido");
+      }
+
+      const salt = await brypt.genSalt();
+      password = await brypt.hash(password, salt);
+
+      const user = await this.prisma.user.update({
+        where: {
+          id: id,
+        },
+        data: {
+          password,
+        },
+      });
+      return this.createToken(user);
+    } catch (error) {
+      throw new BadRequestException(error);
+    }
     //TODO:token valido?
-
-    const id = 1;
-
-    const user = await this.prisma.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        password,
-      },
-    });
-    return this.createToken(user);
   }
 
   async register(data: AuthRegisterDTO) {
