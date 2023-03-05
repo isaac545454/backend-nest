@@ -9,12 +9,12 @@ import {
   UseGuards,
   UseInterceptors,
 } from "@nestjs/common";
-import { paramsId } from "src/decorators/params-id-decorators";
-import { Roles } from "src/decorators/role-decorators";
-import { Role } from "src/enums/role.enum";
-import { AuthGuard } from "src/guards/auth.guard";
-import { RoleGuard } from "src/guards/role.guard";
-import { LogInterceptor } from "src/interceptors/log.interceptor";
+import { paramsId } from "../decorators/params-id-decorators";
+import { Roles } from "../decorators/role-decorators";
+import { Role } from "../enums/role.enum";
+import { AuthGuard } from "../guards/auth.guard";
+import { RoleGuard } from "../guards/role.guard";
+import { LogInterceptor } from "../interceptors/log.interceptor";
 import { CreateUserDTO } from "./dto/create-user.dto";
 import { PathUserDTO } from "./dto/patch-user.dto";
 import { UpdateUserDTO } from "./dto/update-user.dto";

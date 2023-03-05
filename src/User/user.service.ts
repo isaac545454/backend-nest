@@ -1,10 +1,14 @@
 import { PrismaClient } from ".prisma/client";
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { PrismaService } from "src/prisma/prisma.service";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { CreateUserDTO } from "./dto/create-user.dto";
 import { PathUserDTO } from "./dto/patch-user.dto";
 import { UpdateUserDTO } from "./dto/update-user.dto";
 import * as brypt from "bcrypt";
+import { PrismaService } from "../prisma/prisma.service";
 
 @Injectable()
 export class UserService {
@@ -13,6 +17,9 @@ export class UserService {
   }
 
   async create({ email, name, password, role }: CreateUserDTO) {
+    if (await this.prisma.user.count({ where: { email } })) {
+      throw new BadRequestException("Este e-mail já está sendo usado.");
+    }
     const salt = await brypt.genSalt();
 
     password = await brypt.hash(password, salt);
